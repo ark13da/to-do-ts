@@ -4,7 +4,7 @@ import TaskItem from "./TaskItem";
 
 const mockTask = {
   id: 1,
-  text: "Test Task",
+  title: "Test Task",
   completed: false,
 };
 

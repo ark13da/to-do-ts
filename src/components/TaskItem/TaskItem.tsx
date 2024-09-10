@@ -13,7 +13,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
         className={task.completed ? styles.completed : ""}
         onClick={() => toggleTaskCompletion(task.id)}
       >
-        {task.text}
+        {task.title}
       </span>
       <button onClick={() => deleteTask(task.id)}>Delete</button>
     </li>

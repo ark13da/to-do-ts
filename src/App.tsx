@@ -1,4 +1,5 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
+import axios from "axios";
 import { ThemeProvider, useTheme } from "./contexts/ThemeConstext";
 import { TaskType } from "./types/types";
 import TaskInput from "./components/TaskInput/TaskInput";
@@ -6,38 +7,59 @@ import TaskList from "./components/TaskList/TaskList";
 import FilterButtons from "./components/FilterButtons.tsx/FilterButtons";
 import "./App.css";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const App: React.FC = () => {
   const [tasks, setTasks] = useState<TaskType[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
   const [filter, setFilter] = useState<string>("all");
   const { theme, toggleTheme } = useTheme();
 
-  const addTask = useCallback(() => {
+  const fetchTasks = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/tasks`);
+      response.data.sort((a: TaskType, b: TaskType) => a.id - b.id);
+      setTasks(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  const addTask = useCallback(async () => {
     if (inputValue.trim() === "") return;
-    setTasks([
-      ...tasks,
-      { id: Date.now(), text: inputValue, completed: false },
-    ]);
-    setInputValue("");
-  }, [inputValue, tasks]);
+    try {
+      await axios.post(`${API_URL}/tasks`, {
+        title: inputValue,
+        completed: false,
+      });
+      fetchTasks();
+      setInputValue("");
+    } catch (error) {
+      console.error("Failed to add task", error);
+    }
+  }, [inputValue]);
 
-  const deleteTask = useCallback(
-    (id: number) => {
-      setTasks(tasks.filter((task) => task.id !== id));
-    },
-    [tasks]
-  );
+  const deleteTask = async (id: number) => {
+    try {
+      await axios.delete(`${API_URL}/tasks/${id}`);
+      fetchTasks();
+    } catch (error) {
+      console.error("Failed to delete task", error);
+    }
+  };
 
-  const toggleTaskCompletion = useCallback(
-    (id: number) => {
-      setTasks(
-        tasks.map((task) =>
-          task.id === id ? { ...task, completed: !task.completed } : task
-        )
-      );
-    },
-    [tasks]
-  );
+  const toggleTaskCompletion = async (id: number) => {
+    try {
+      await axios.patch(`${API_URL}/tasks/${id}/complete`);
+      fetchTasks();
+    } catch (error) {
+      console.error("Failed to toggle task completion", error);
+    }
+  };
 
   const filteredTasks = tasks.filter((task) => {
     if (filter === "completed") return task.completed;

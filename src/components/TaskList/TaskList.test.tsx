@@ -3,8 +3,8 @@ import { render, screen } from "@testing-library/react";
 import TaskList from "./TaskList";
 
 const mockTasks = [
-  { id: 1, text: "Task 1", completed: false },
-  { id: 2, text: "Task 2", completed: true },
+  { id: 1, title: "Task 1", completed: false },
+  { id: 2, title: "Task 2", completed: true },
 ];
 
 describe("TaskList component", () => {

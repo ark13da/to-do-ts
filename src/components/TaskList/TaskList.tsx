@@ -8,7 +8,7 @@ const TaskList: React.FC<TaskListProps> = ({
   toggleTaskCompletion,
   deleteTask,
 }) => {
-  return (
+  return ( 
     <ul className={styles.taskList}>
       {tasks.map((task) => (
         <TaskItem
